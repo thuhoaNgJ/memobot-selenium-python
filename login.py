@@ -1,11 +1,6 @@
 import setupDriver
-
 from selenium import webdriver
-import unittest
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
@@ -152,7 +147,6 @@ def check_user_package(url):
         actual_luu_tru_time = driver.find_element(By.XPATH, "//div[@class='info_user_right p-4']//div[@class='mb-4'][3]//div[@class='content_info']//span[1]").text
         print(f"The actual 'luu_tru' presented on the screen is: {actual_luu_tru_time}")
 
-
         # Compare number of uploaded files minute (from API response) to the one on the screen
         so_file_upload = data.get("data", {}).get("current", {}).get("value", {}).get("so_file_upload", {}).get("value", None)
         if luu_tru is not None:
@@ -164,7 +158,6 @@ def check_user_package(url):
         # Retrieve actual 'so_file_upload' from the UI
         actual_so_file_upload = driver.find_element(By.XPATH, "//div[@class='info_user_right p-4']//div[@class='mb-4'][1]//div[@class='content_info']//span[1]").text
         print(f"The actual 'so_file_upload' presented on the screen is: {actual_so_file_upload}")
-
 
         # Compare number of uploaded files minute (from API response) to the one on the screen
         so_file_upload = data.get("data", {}).get("current", {}).get("value", {}).get("so_file_upload", {}).get("value", None)
@@ -180,8 +173,7 @@ def check_user_package(url):
 
 # Check list languages
 def check_list_languages():
-    cur_url = driver.current_url
-    home_url = "https://app.memobot.io"
+    go_to_page("https://app.memobot.io")
 
     upload_button = wait.until(EC.presence_of_element_located((By.XPATH, "//button[@id='upload-audio']")))
     driver.execute_script("arguments[0].click();", upload_button)
@@ -268,10 +260,9 @@ def upload_file(audio_path, audio_upload_name):
 
         # Check if audio name is in the list
         if audio_upload_name in audio_texts:
-            print("✅ 'abc' is found in the list!")
-            
+            print("✅ Uploaded file is found in the list!")
         else:
-            print("❌ 'abc' is NOT found in the list.")
+            print("❌ Uploaded file is NOT found in the list.")
             
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -308,8 +299,8 @@ email_plus = "memo17@mailinator.com"
 password_plus = "Abcd@12345"
 url = "https://sohoa.memobot.io/analytic-v2/api/v1/payment/user-usage-stats"
 audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/File 24p - Cách nhanh nhất để nâng cấp bản thân.mp3"
-
 audio_upload_name = "File 24p - Cách nhanh nhất để nâng cấp bản thân"
+
 check_login(email_plus, password_plus)
 # check_account_information()
 get_token_from_local_storage()
