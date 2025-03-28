@@ -316,9 +316,7 @@ def edit_audio_name():
     # Click vào biểu tượng lịch
     wait.until(EC.element_to_be_clickable((By.XPATH, "//i[@class='fa fa-calendar']"))).click()
     time.sleep(5)
-
     driver.back()
-
     audio_name = [element.text.strip() for element in audio_titles]
     print("Search results audio title: ", audio_name)
     # check if the search_input appear anywhere in the audio_title of the result list
