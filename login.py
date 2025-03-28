@@ -295,6 +295,39 @@ def filter_audio_by_date():
     except Exception as e:
         print(f"An error occurred: {e}")
 
+
+def edit_audio_name():
+    go_to_page("https://app.memobot.io/")
+
+    audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
+    
+    if len(audio_titles) > 1:  # Kiểm tra tránh lỗi IndexError
+        audio_titles[0].click()
+    else:
+        print("This account doesn't have any audio")
+        return
+    
+    # Tìm và nhập nội dung vào textarea
+    time.sleep(5)
+    title_areatext = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//textarea[contains(@class, 'f4 w-100 mb2')]")))
+    title_areatext[0].clear()  # Xóa nội dung cũ trước khi nhập mới
+    title_areatext[0].send_keys("Tên mới của audio")
+
+    # Click vào biểu tượng lịch
+    wait.until(EC.element_to_be_clickable((By.XPATH, "//i[@class='fa fa-calendar']"))).click()
+    time.sleep(5)
+
+    driver.back()
+
+    audio_name = [element.text.strip() for element in audio_titles]
+    print("Search results audio title: ", audio_name)
+    # check if the search_input appear anywhere in the audio_title of the result list
+    if any("Tên mới của audio" in title for title in audio_name):
+        print("✅ Audio title is changed successfully!")
+    else:
+        print("❌ Audio title is changed unsuccessfully")
+
+
 email_plus = "memo17@mailinator.com"
 password_plus = "Abcd@12345"
 url = "https://sohoa.memobot.io/analytic-v2/api/v1/payment/user-usage-stats"
@@ -303,13 +336,14 @@ audio_upload_name = "File 24p - Cách nhanh nhất để nâng cấp bản thân
 
 check_login(email_plus, password_plus)
 # check_account_information()
-get_token_from_local_storage()
+# get_token_from_local_storage()
 # check_user_package(url)
 # check_list_languages()
 # upload_file()
 # upload_file(audio_path, audio_upload_name)
 # search_input = "nội dung tiêu cực" 
 # search_audio(search_input)
+edit_audio_name()
 
 
 

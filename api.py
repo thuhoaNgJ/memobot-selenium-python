@@ -12,7 +12,7 @@ def login(username, password):
     }
 
     response = requests.post(url, json=payload, headers=headers)
-
+ 
     print("Response Status Code:", response.status_code)
     print("Raw Response Text:", response.text) 
 
