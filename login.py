@@ -295,14 +295,13 @@ def filter_audio_by_date():
     except Exception as e:
         print(f"An error occurred: {e}")
 
-
-def edit_audio_name():
+def edit_audio_name(title_id, new_title):
     go_to_page("https://app.memobot.io/")
 
     audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
     
     if len(audio_titles) > 1:  # Kiểm tra tránh lỗi IndexError
-        audio_titles[0].click()
+        audio_titles[title_id].click()
     else:
         print("This account doesn't have any audio")
         return
@@ -310,11 +309,10 @@ def edit_audio_name():
     # Tìm và nhập nội dung vào textarea
     time.sleep(5)
     title_areatext = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//textarea[contains(@class, 'f4 w-100 mb2')]")))
-    title_areatext[0].clear()  # Xóa nội dung cũ trước khi nhập mới
-    title_areatext[0].send_keys("Tên mới của audio")
-
-    # Click vào biểu tượng lịch
-    wait.until(EC.element_to_be_clickable((By.XPATH, "//i[@class='fa fa-calendar']"))).click()
+    title_areatext[title_id].clear()  # Xóa nội dung cũ trước khi nhập mới
+    time.sleep(3)
+    title_areatext[title_id].send_keys(new_title)
+    driver.find_element(By.XPATH, "//button[contains(text(),'Đánh dấu')]").click()
     time.sleep(5)
     driver.back()
     audio_name = [element.text.strip() for element in audio_titles]
@@ -324,6 +322,36 @@ def edit_audio_name():
         print("✅ Audio title is changed successfully!")
     else:
         print("❌ Audio title is changed unsuccessfully")
+
+
+
+
+
+def delete_audio():
+    go_to_page("https://app.memobot.io/")
+    audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/[File 2p20s] Phim ngắn_ phản cảm trên MXH.mp3"
+    upload_file(audio_path, "")
+    edit_audio_name() #edit the first audio name -> easy to get the correct audio to delete
+    audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
+    
+    if len(audio_titles) > 0:  # Kiểm tra tránh lỗi IndexError
+        delete_audio_btn = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//button[@id='delete_transcript'])[1]")))
+        delete_audio_btn.click()
+        wait.until(EC.presence_of_all_elements_located(By.XPATH, "//h2[contains(text(),'Xóa bản ghi âm')]"))
+        cancel_delete_btn = driver.find_element(By.XPATH, "//div[contains(@class,'title_popup_notice_payment_dialog')] //button[2]")
+        time.sleep(5)
+        if len(audio_titles > 0):
+            print("The first audio title: ", audio_titles[0])
+
+            return
+        else:
+            print("Audio is already deleted")
+# //div[contains(@class,'title_popup_notice_payment_dialog')] //button[2]
+
+    else:
+        print("This account doesn't have any audio")
+        return
+    return
 
 
 email_plus = "memo17@mailinator.com"
@@ -341,7 +369,7 @@ check_login(email_plus, password_plus)
 # upload_file(audio_path, audio_upload_name)
 # search_input = "nội dung tiêu cực" 
 # search_audio(search_input)
-edit_audio_name()
+edit_audio_name(0,"Tên mới của audio")
 
 
 
