@@ -323,35 +323,32 @@ def edit_audio_name(title_id, new_title):
     else:
         print("❌ Audio title is changed unsuccessfully")
 
-
-
-
-
 def delete_audio():
     go_to_page("https://app.memobot.io/")
     audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/[File 2p20s] Phim ngắn_ phản cảm trên MXH.mp3"
-    upload_file(audio_path, "")
-    edit_audio_name() #edit the first audio name -> easy to get the correct audio to delete
+    audio_upload_name = "[File 2p20s] Phim ngắn_ phản cảm trên MXH"
+    upload_file(audio_path, audio_upload_name)
+    time.sleep(5) #wait audio done 
+    print("DONEEEEEEEEEEEEEEEEEEEE")
     audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
-    
+
     if len(audio_titles) > 0:  # Kiểm tra tránh lỗi IndexError
-        delete_audio_btn = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//button[@id='delete_transcript'])[1]")))
+        delete_audio_btn = wait.until(EC.presence_of_all_elements_located((By.XPATH, "(//button[@id='delete_transcript'])[1]")))
         delete_audio_btn.click()
         wait.until(EC.presence_of_all_elements_located(By.XPATH, "//h2[contains(text(),'Xóa bản ghi âm')]"))
         cancel_delete_btn = driver.find_element(By.XPATH, "//div[contains(@class,'title_popup_notice_payment_dialog')] //button[2]")
         time.sleep(5)
+        delete_audio_title = audio_titles[0]
+        print("The audio's name is chosen to deleted: " + delete_audio_title)
         if len(audio_titles > 0):
             print("The first audio title: ", audio_titles[0])
-
-            return
-        else:
-            print("Audio is already deleted")
-# //div[contains(@class,'title_popup_notice_payment_dialog')] //button[2]
-
-    else:
-        print("This account doesn't have any audio")
-        return
-    return
+            driver.find_element(By.XPATH, "(//button[@id='delete_transcript'])[1]").click()
+            wait.until(EC.presence_of_all_elements_located((By.XPATH, "//h2[contains(text(),'Xóa bản ghi âm')]")))
+            driver.find_element(By.XPATH,"(//span[contains(text(),'Xóa')])[2]").click()
+            time.sleep(5)
+            print("The first audio title after deleting the first audio: ", audio_titles[0])
+            if (delete_audio_title != audio_titles[0]):
+                print("DONE delete the first audio of the audio list")
 
 
 email_plus = "memo17@mailinator.com"
@@ -369,7 +366,8 @@ check_login(email_plus, password_plus)
 # upload_file(audio_path, audio_upload_name)
 # search_input = "nội dung tiêu cực" 
 # search_audio(search_input)
-edit_audio_name(0,"Tên mới của audio")
+# edit_audio_name(0,"Tên mới của audio")
+delete_audio()
 
 
 

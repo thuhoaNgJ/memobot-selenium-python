@@ -12,3 +12,4 @@ def setupWebdriver():
     driver.get("https://app.memobot.io/")
     time.sleep(10)
     return driver
+
