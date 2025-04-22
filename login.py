@@ -3,7 +3,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.chrome.options import Options
+from langdetect import detect
 import requests
 import json
 import time
@@ -11,6 +12,7 @@ import os
 
 driver = setupDriver.setupWebdriver()
 wait = WebDriverWait(driver, 10)
+options = Options()
 
 def check_login(email, password):
     input_email = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="Email"]')
@@ -218,37 +220,20 @@ def go_to_page(url):
 # Check upload file
 def upload_file(audio_path, audio_upload_name):
     go_to_page("https://app.memobot.io/")
-    # Click button upload file
-    upload_button = wait.until(EC.presence_of_element_located((By.XPATH, "//button[@id='upload-audio']")))
-    # audio_upload_name = "File 24p - Cách nhanh nhất để nâng cấp bản thân"
+    time.sleep(5)
+    print("Heloo")
+    driver.set_window_size(800, 800)
+    driver.refresh() 
+    
     try:
         file_input = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='file']")))
         file_path = os.path.abspath(audio_path)
         file_input.send_keys(file_path)
-        try:
-            title_element = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH,"//h2[contains(text(),'Chọn kênh âm thanh')]")))
-            print("Element appeared:", title_element.text)
-            time.sleep(5)
-            channel_button = wait.until(EC.visibility_of_element_located(
-                (By.XPATH,"(//button[@class='el-button el-button--default'] / span[contains(.,'Chọn kênh này')])[1]"))
-                )
-            time.sleep(5)
-            channel_button.click()
-            print("Clicked 'Chọn kênh này' của kênh số 1")
-        except TimeoutException:
-            print("Element 'Chọn kênh này' not found")
-        loading_text = wait.until(
-        EC.visibility_of_element_located((By.XPATH, "//p[contains(text(),'Đang convert file')]"))
-        )
-
-        print("Loading text: ", loading_text.text)
-        # Then, wait for it to disappear
-        WebDriverWait(driver, 100).until(EC.invisibility_of_element_located((By.XPATH, "//p[contains(text(),'Đang convert file')]")))
-        print("Loading text disappeared.")
-        time.sleep(5)
         
-        # Wait for all elements with class 'audio_title' to appear 
-        # Means the audio is successfully uploaded
+        # WebDriverWait(driver, 100).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(., 'Tệp âm thanh')]")))
+        # print("testtttttttttttttt")
+
+        time.sleep(5)
         audio_elements = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']"))
         )
@@ -345,30 +330,54 @@ def delete_audio():
             audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
             print("The first audio title after deleting the first audio: ", audio_titles[0].text)
             if (delete_audio_title != audio_titles[0].text):
-                print("DONE delete the first audio of the audio list")
+                print("✅DONE delete the first audio of the audio list")
             else:
-                print("Audio hasn't been deleted.")
+                print("❌Audio hasn't been deleted.")
         else:
-            print("The number of audio is 0. The audio is already deleted.")
+            print("✅The number of audio is 0. The audio is already deleted.")
 
+def filter_audio_by_date():
+    go_to_page("https://app.memobot.io/")
+    calender_filter = wait.until(EC.presence_of_all_elements_located(
+        (By.XPATH, "//input[contains(@placeholder, 'Tìm từ ngày')]")))
+    calender_filter.click()
+    wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='vc-weeks']")))
+    return
+
+
+def check_language():
+    go_to_page("https://app.memobot.io/")
+    # upload_file(audio_path, audio_upload_name)
+    vi_audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
+    vi_audio_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24"
+    upload_file(vi_audio_path, vi_audio_name)
+    print("DONE upload vietnamese audio")
+    # wait until the audio complete
+    wait.until(EC.presence_of_element_located((By.XPATH, "(//p[contains(text(),'Tệp âm thanh')])"))) 
+    audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
+    print("Audio uploaded name: " + audio_titles[0].text)
+    audio_titles[0].click()
+
+    return
 
 email_plus = "memo17@mailinator.com"
 password_plus = "Abcd@12345"
 url = "https://sohoa.memobot.io/analytic-v2/api/v1/payment/user-usage-stats"
-audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/File 24p - Cách nhanh nhất để nâng cấp bản thân.mp3"
-audio_upload_name = "File 24p - Cách nhanh nhất để nâng cấp bản thân"
+audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
+audio_upload_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24" #get the exactly name of the audio after successfully
 
 check_login(email_plus, password_plus)
 # check_account_information()
 # get_token_from_local_storage()
 # check_user_package(url)
 # check_list_languages()
-# upload_file()
 # upload_file(audio_path, audio_upload_name)
 # search_input = "nội dung tiêu cực" 
 # search_audio(search_input)
 # edit_audio_name(0,"Tên mới của audio")
-delete_audio()
+# delete_audio()
+# filter_audio_by_date()
+check_language()
 
 
 
