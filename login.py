@@ -232,6 +232,7 @@ def upload_file(audio_path, audio_upload_name):
             channel_button = wait.until(EC.visibility_of_element_located(
                 (By.XPATH,"(//button[@class='el-button el-button--default'] / span[contains(.,'Chọn kênh này')])[1]"))
                 )
+            time.sleep(5)
             channel_button.click()
             print("Clicked 'Chọn kênh này' của kênh số 1")
         except TimeoutException:
@@ -325,30 +326,30 @@ def edit_audio_name(title_id, new_title):
 
 def delete_audio():
     go_to_page("https://app.memobot.io/")
-    audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/[File 2p20s] Phim ngắn_ phản cảm trên MXH.mp3"
-    audio_upload_name = "[File 2p20s] Phim ngắn_ phản cảm trên MXH"
-    upload_file(audio_path, audio_upload_name)
-    time.sleep(5) #wait audio done 
-    print("DONEEEEEEEEEEEEEEEEEEEE")
     audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
 
-    if len(audio_titles) > 0:  # Kiểm tra tránh lỗi IndexError
-        delete_audio_btn = wait.until(EC.presence_of_all_elements_located((By.XPATH, "(//button[@id='delete_transcript'])[1]")))
+    if len(audio_titles) > 0: 
+        delete_audio_title = audio_titles[0].text
+        print("The audio's name is chosen to delete: " + delete_audio_title) 
+
+        delete_audio_btn = wait.until(EC.visibility_of_element_located((By.XPATH, "(//button[@id='delete_transcript'])[1]"))) 
         delete_audio_btn.click()
-        wait.until(EC.presence_of_all_elements_located(By.XPATH, "//h2[contains(text(),'Xóa bản ghi âm')]"))
-        cancel_delete_btn = driver.find_element(By.XPATH, "//div[contains(@class,'title_popup_notice_payment_dialog')] //button[2]")
+        wait.until(EC.presence_of_all_elements_located((By.XPATH, "//h2[contains(text(),'Xóa bản ghi âm')]")))
+        confirm_delete_btn = wait.until(EC.visibility_of_element_located((
+            By.XPATH, "//button[@class='el-button mt-4 btn_new_layout_v2_popup el-button--danger']//span[contains(text(),'Xóa')]")))
+        confirm_delete_btn.click()
         time.sleep(5)
-        delete_audio_title = audio_titles[0]
-        print("The audio's name is chosen to deleted: " + delete_audio_title)
-        if len(audio_titles > 0):
-            print("The first audio title: ", audio_titles[0])
-            driver.find_element(By.XPATH, "(//button[@id='delete_transcript'])[1]").click()
-            wait.until(EC.presence_of_all_elements_located((By.XPATH, "//h2[contains(text(),'Xóa bản ghi âm')]")))
-            driver.find_element(By.XPATH,"(//span[contains(text(),'Xóa')])[2]").click()
-            time.sleep(5)
-            print("The first audio title after deleting the first audio: ", audio_titles[0])
-            if (delete_audio_title != audio_titles[0]):
+
+        # compare the 1st audio's name before and after deleteing
+        if len(audio_titles) > 0: 
+            audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
+            print("The first audio title after deleting the first audio: ", audio_titles[0].text)
+            if (delete_audio_title != audio_titles[0].text):
                 print("DONE delete the first audio of the audio list")
+            else:
+                print("Audio hasn't been deleted.")
+        else:
+            print("The number of audio is 0. The audio is already deleted.")
 
 
 email_plus = "memo17@mailinator.com"
