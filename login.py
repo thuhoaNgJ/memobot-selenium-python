@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from langdetect import detect
+from collections import Counter
 import requests
 import json
 import time
@@ -305,26 +306,7 @@ def filter_audio_by_date():
     calender_filter.click()
     wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='vc-weeks']")))
     return
-
-
-def check_language():
-    go_to_page("https://app.memobot.io/")
-    # vi_audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
-    # vi_audio_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24"
-    # upload_file(vi_audio_path, vi_audio_name)
-    # print("DONE upload vietnamese audio")
-    # # wait until the audio complete
-    # wait.until(EC.presence_of_element_located((By.XPATH, "(//p[contains(text(),'Tệp âm thanh')])"))) 
-    audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
-    print("Audio uploaded name: " + audio_titles[0].text)
-    audio_titles[0].click()
-
-    content_audio = wait.until(EC.visibility_of_element_located((By.XPATH, "//button[contains(text(),'Bản dịch')]")))
-    content_audio.click()
-    WebDriverWait(driver, 50).until(EC.presence_of_element_located((By.XPATH, "//span[contains(@data-type,'audio-text')]")))
-    audio_text = driver.find_elements(By.XPATH, "//span[contains(@data-type,'audio-text')]")
-    print("The first word of audio text: " + audio_text[0].text)
-    
+ 
 
 def upload_file(audio_path, audio_upload_name):
     go_to_page("https://app.memobot.io/")
@@ -405,6 +387,71 @@ def upload_file(audio_path, audio_upload_name):
         print(f"An error occurred: {e}")
 
 
+
+def check_language(chosen_language):
+    go_to_page("https://app.memobot.io/")
+    # vi_audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
+    # vi_audio_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24"
+    # upload_file(vi_audio_path, vi_audio_name)
+    # print("DONE upload vietnamese audio")
+    # # wait until the audio complete
+    # wait.until(EC.presence_of_element_located((By.XPATH, "(//p[contains(text(),'Tệp âm thanh')])"))) 
+    audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
+    print("Audio uploaded name: " + audio_titles[0].text)
+    audio_titles[0].click()
+
+    content_audio = wait.until(EC.visibility_of_element_located((By.XPATH, "//button[contains(text(),'Bản dịch')]")))
+    content_audio.click()
+    WebDriverWait(driver, 50).until(EC.presence_of_element_located((By.XPATH, "//span[contains(@data-type,'audio-text')]")))
+    audio_text = driver.find_elements(By.XPATH, "//span[contains(@data-type,'audio-text')]")
+    print("The first word of audio text: " + audio_text[0].text)
+
+    
+    all_words = []
+    non_vi_words = []
+
+    for element in audio_text:
+        word = element.text.strip()
+        if word:
+            all_words.append(word)
+
+    # Gộp lại thành 1 câu
+    full_text = ' '.join(all_words)
+    print("📝 Full sentence:", full_text)
+
+    # Đếm số lượng từng ngôn ngữ
+    lang_count = Counter()
+
+    for word in all_words:
+        try:
+            lang = detect(word)
+            lang_count[lang] += 1
+
+            if lang != 'vi':
+                non_vi_words.append((word, lang))
+        except Exception as e:
+            print(f"⚠️ Lỗi khi detect từ '{word}': {e}")
+
+    # 🧠 In kết quả
+    most_common_lang = lang_count.most_common(1)[0][0] if lang_count else 'unknown'
+    print(f"\n🔍 Ngôn ngữ chiếm ưu thế: {most_common_lang}")
+
+    if most_common_lang == 'vi':
+        print("✅ Đoạn text chủ yếu là tiếng Việt.")
+    else:
+        print(f"❌ Không phải tiếng Việt, có vẻ là: {most_common_lang}")
+
+    # 📌 In các từ không phải tiếng Việt
+    if non_vi_words:
+        print("\n📛 Các từ không phải tiếng Việt:")
+        for word, lang in non_vi_words:
+            print(f"  - '{word}' ➡ {lang}")
+    else:
+        print("\n🎉 Không có từ nào khác ngoài tiếng Việt.")
+    
+   
+
+
 email_plus = "memo17@mailinator.com"
 password_plus = "Abcd@12345"
 url = "https://sohoa.memobot.io/analytic-v2/api/v1/payment/user-usage-stats"
@@ -423,7 +470,7 @@ check_login(email_plus, password_plus)
 # edit_audio_name(0,"Tên mới của audio")
 # delete_audio()
 # filter_audio_by_date()
-# check_language()
+check_language()
 
 
 
