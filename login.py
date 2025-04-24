@@ -194,7 +194,6 @@ def check_list_languages():
 
         # Extract the text from each dropdown element
         dropdown_languages = [item.text.strip() for item in li_elements]
-        # print("dropdown_languages: " + dropdown_languages)
         
         # Check if all items in List A are in the dropdown texts
         missing_items = [item for item in list_A if item not in dropdown_languages]
@@ -216,43 +215,6 @@ def go_to_page(url):
         print(f"Redirected to {url}")
     else:
         print("Already on the correct page, continuing execution.")
-
-# Check upload file
-def upload_file(audio_path, audio_upload_name):
-    go_to_page("https://app.memobot.io/")
-    time.sleep(5)
-    print("Heloo")
-    driver.set_window_size(800, 800)
-    driver.refresh() 
-    
-    try:
-        file_input = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='file']")))
-        file_path = os.path.abspath(audio_path)
-        file_input.send_keys(file_path)
-        
-        # WebDriverWait(driver, 100).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(., 'Tệp âm thanh')]")))
-        # print("testtttttttttttttt")
-
-        time.sleep(5)
-        audio_elements = WebDriverWait(driver, 10).until(
-            EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']"))
-        )
-
-        # Extract text from all elements
-        audio_texts = [element.text.strip() for element in audio_elements]
-
-        # Print all extracted texts
-        print("List of audio titles:", audio_texts)
-
-        # Check if audio name is in the list
-        if audio_upload_name in audio_texts:
-            print("✅ Uploaded file is found in the list!")
-        else:
-            print("❌ Uploaded file is NOT found in the list.")
-            
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
 
 def search_audio(search_input):
     go_to_page("https://app.memobot.io/")
@@ -347,24 +309,108 @@ def filter_audio_by_date():
 
 def check_language():
     go_to_page("https://app.memobot.io/")
-    # upload_file(audio_path, audio_upload_name)
-    vi_audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
-    vi_audio_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24"
-    upload_file(vi_audio_path, vi_audio_name)
-    print("DONE upload vietnamese audio")
-    # wait until the audio complete
-    wait.until(EC.presence_of_element_located((By.XPATH, "(//p[contains(text(),'Tệp âm thanh')])"))) 
+    # vi_audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
+    # vi_audio_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24"
+    # upload_file(vi_audio_path, vi_audio_name)
+    # print("DONE upload vietnamese audio")
+    # # wait until the audio complete
+    # wait.until(EC.presence_of_element_located((By.XPATH, "(//p[contains(text(),'Tệp âm thanh')])"))) 
     audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
     print("Audio uploaded name: " + audio_titles[0].text)
     audio_titles[0].click()
 
-    return
+    content_audio = wait.until(EC.visibility_of_element_located((By.XPATH, "//button[contains(text(),'Bản dịch')]")))
+    content_audio.click()
+    WebDriverWait(driver, 50).until(EC.presence_of_element_located((By.XPATH, "//span[contains(@data-type,'audio-text')]")))
+    audio_text = driver.find_elements(By.XPATH, "//span[contains(@data-type,'audio-text')]")
+    print("The first word of audio text: " + audio_text[0].text)
+    
+
+def upload_file(audio_path, audio_upload_name):
+    go_to_page("https://app.memobot.io/")
+    time.sleep(5)
+    
+    try:
+        # Choose language
+        upload_file_btn = driver.find_element(By.XPATH, "//span[@class='title-file-upload']")
+        upload_file_btn.click()
+        language_dropdowns = driver.find_element(
+            By.XPATH, "//div[@class='pb_share absolute hidden show']//input[@placeholder='Select']")
+        language_dropdowns.click()
+        
+        language_options = wait.until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "li.el-select-dropdown__item > span"))
+        )
+        language_name = [item.text.strip() for item in language_options]
+        print(language_name)
+        chosen_language = 'Tiếng Anh'
+
+        for option in language_options:
+            text = option.text.strip()
+            if text == chosen_language:
+                option.click()
+                print(f"✅ Đã chọn ngôn ngữ: {text}")
+                break
+        else:
+            print(f"❌ Không tìm thấy ngôn ngữ: {chosen_language}")
+ 
+        # Upload file audio theo ngôn ngữ đã chọn
+
+        # driver.set_window_size(800, 800)
+        # driver.refresh() 
+        file_input = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='file']")))
+        file_path = os.path.abspath(audio_path)
+        file_input.send_keys(file_path)
+
+        try:
+             title_element = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH,"//h2[contains(text(),'Chọn kênh âm thanh')]")))
+             print("Element appeared:", title_element.text)
+             time.sleep(5)
+             channel_button = wait.until(EC.visibility_of_element_located(
+                 (By.XPATH,"(//button[@class='el-button el-button--default'] / span[contains(.,'Chọn kênh này')])[1]"))
+                 )
+             time.sleep(5)
+             channel_button.click()
+             print("Clicked 'Chọn kênh này' của kênh số 1")
+        except TimeoutException:
+             print("Element 'Chọn kênh này' not found")
+        loading_text = wait.until(
+         EC.visibility_of_element_located((By.XPATH, "//p[contains(text(),'Đang convert file')]"))
+         )
+ 
+        print("Loading text: ", loading_text.text)
+         # Then, wait for it to disappear
+        WebDriverWait(driver, 100).until(EC.invisibility_of_element_located((By.XPATH, "//p[contains(text(),'Đang convert file')]")))
+        print("Loading text disappeared.")
+        time.sleep(5)
+
+        time.sleep(5)
+        audio_elements = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']"))
+        )
+
+        # Extract text from all elements
+        audio_texts = [element.text.strip() for element in audio_elements]
+
+        # Print all extracted texts
+        print("List of audio titles:", audio_texts)
+
+        # Check if audio name is in the list
+        if audio_upload_name in audio_texts:
+            print("✅ Uploaded file is found in the list!")
+        else:
+            print("❌ Uploaded file is NOT found in the list.")
+            
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 
 email_plus = "memo17@mailinator.com"
 password_plus = "Abcd@12345"
 url = "https://sohoa.memobot.io/analytic-v2/api/v1/payment/user-usage-stats"
 audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
 audio_upload_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24" #get the exactly name of the audio after successfully
+
 
 check_login(email_plus, password_plus)
 # check_account_information()
@@ -377,7 +423,9 @@ check_login(email_plus, password_plus)
 # edit_audio_name(0,"Tên mới của audio")
 # delete_audio()
 # filter_audio_by_date()
-check_language()
+# check_language()
+
+
 
 
 
