@@ -223,7 +223,7 @@ def search_audio(search_input):
         print("search input is: ", search_input)
         search_textbox = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@id='search_transcript']")))
         search_textbox.send_keys(search_input)
-        time.sleep(5)
+        time.sleep(10)
         searched_audio_title = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']"))
         )
@@ -460,16 +460,15 @@ def check_language(chosen_language, audio_path, audio_upload_name):
     go_to_page("https://app.memobot.io/")
     upload_file(chosen_language, audio_path, audio_upload_name)
     lang_code = get_lang_code(chosen_language)
-    # vi_audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
-    # vi_audio_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24"
-    # chosen_language = 'vi'
-    # upload_file(chosen_language, vi_audio_path, vi_audio_name)
     print("DONE upload " + chosen_language + " audio")
     # wait until the audio complete
     # WebDriverWait(driver, 50).until(EC.presence_of_element_located((By.XPATH, "(//p[contains(text(),'Tệp âm thanh')])"))) 
     audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
     print("Audio uploaded name: " + audio_titles[0].text)
     audio_titles[1].click()
+
+    # Gộp lại thành màn 'Bản dịch' thành 1 câu, sau đó dùng detect_language_from_text() 
+    # để check xem ngôn ngữ xuất hiện chủ yếu trong bản dịch audio là gì
 
     content_audio = wait.until(EC.visibility_of_element_located((By.XPATH, "//button[contains(text(),'Bản dịch')]")))
     content_audio.click()
@@ -478,50 +477,61 @@ def check_language(chosen_language, audio_path, audio_upload_name):
     print("The first word of audio text: " + audio_text[0].text)
 
     all_words = []
-    non_chosen_words = []
 
     for element in audio_text:
         word = element.text.strip()
         if word:
-            all_words.append(word)
+            all_words.append(word) 
 
     # Gộp lại thành 1 câu
     full_text = ' '.join(all_words)
     print("📝 Full sentence:", full_text)
     detect_language_from_text(full_text, lang_code)
 
-    # # Đếm số lượng từng ngôn ngữ
-    # lang_count = Counter()
 
-    # for word in all_words:
-    #     try:
-    #         lang = detect(word)
-    #         lang_count[lang] += 1
+def edit_audio_summary():
+    search_input= 'Holodomor'
+    search_audio(search_input)
+    audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
+    audio_titles[0].click()
+    time.sleep(5)
 
-    #         if lang != 'vi':
-    #             non_chosen_words.append((word, lang))
-    #     except Exception as e:
-    #         print(f"⚠️ Lỗi khi detect từ '{word}': {e}")
 
-    # # 🧠 In kết quả
-    # most_common_lang = lang_count.most_common(1)[0][0] if lang_count else 'unknown'
-    # print(f"\n🔍 Ngôn ngữ chiếm ưu thế: {most_common_lang}")
+    # Tìm phần tử contenteditable
+    p = driver.find_element(By.CSS_SELECTOR, "div[contenteditable='true']")
 
-    # if most_common_lang == 'vi':
-    #     print("✅ Đoạn text chủ yếu là tiếng Việt.")
-    # else:
-    #     print(f"❌ Không phải tiếng Việt, có vẻ là: {most_common_lang}")
+    # Lấy HTML hiện tại trong phần tử
+    html = p.get_attribute("innerHTML")
 
-    # # 📌 In các từ không phải tiếng Việt
-    # if non_chosen_words:
-    #     print("\n📛 Các từ không phải tiếng Việt:")
-    #     for word, lang in non_chosen_words:
-    #         print(f"  - '{word}' ➡ {lang}")
-    # else:
-    #     print("\n🎉 Không có từ nào khác ngoài tiếng Việt.")
-    
-   
+    # Đoạn văn bản mục tiêu
+    targetText = "gây ra bởi các chính sách tàn bạo của chính quyền Liên Xô dưới sự lãnh đạo của Joseph Stalin."
+    # Đoạn văn bản cần chèn
+    insertText = " Đây là một trong những chủ đề được cộng đồng học thuật và chính trị quốc tế quan tâm ngày càng nhiều trong những năm gần đây."
 
+    # Kiểm tra nếu targetText có trong đoạn HTML của phần tử
+    if targetText in html:
+        print("✅ Đoạn văn bản mục tiêu đã được tìm thấy!")
+
+        # Chèn đoạn văn bản insertText vào đúng vị trí trước targetText
+        new_html = html.replace(targetText, insertText + targetText)
+
+        # Cập nhật lại nội dung trong phần tử
+        driver.execute_script("arguments[0].innerHTML = arguments[1];", p, new_html)
+
+        # Đợi một chút để xem kết quả
+        time.sleep(2)
+
+        # Lấy lại nội dung sau khi thay đổi
+        paragraphs_after_added = p.get_attribute("innerHTML")
+
+        # Kiểm tra xem đoạn văn bản insertText đã được thêm vào đúng vị trí chưa
+        if insertText in paragraphs_after_added:
+            print("✅ Đã chèn vào đoạn văn đúng!")
+        else:
+            print("❌ Chưa chèn đúng vào đoạn văn!")
+    else:
+        print("❌ Không tìm thấy đoạn văn bản mục tiêu!")
+        
 
 email_plus = "memo17@mailinator.com"
 password_plus = "Abcd@12345"
@@ -533,18 +543,19 @@ check_login(email_plus, password_plus)
 # check_account_information()
 # get_token_from_local_storage()
 # check_user_package(url)
-check_list_languages()
+# check_list_languages()
 # upload_file("Tiếng Việt", audio_path, audio_upload_name)
 # search_input = "nội dung tiêu cực" 
 # search_audio(search_input)
 # edit_audio_name(0,"Tên mới của audio")
 # delete_audio()
 # filter_audio_by_date()
-vi_audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
-vi_audio_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24"
+check_language_audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
+check_language_audio_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24"
 chosen_language = 'Tiếng Việt'
 #check language of an uploaded audio
-check_language(chosen_language, vi_audio_path, vi_audio_name)
+# check_language(chosen_language, check_language_audio_path, check_language_audio_name)
+edit_audio_summary()
 
 
 
