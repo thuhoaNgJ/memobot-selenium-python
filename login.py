@@ -490,12 +490,16 @@ def check_language(chosen_language, audio_path, audio_upload_name):
 
 
 def edit_audio_summary():
+    driver.get("https://app.memobot.io/")
+    time.sleep(10)
     search_input= 'Holodomor'
     search_audio(search_input)
     audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
     audio_titles[0].click()
     time.sleep(5)
-
+    timeline_tab = driver.find_element(By.XPATH, "//button[contains(text(),'Dòng thời gian')]")
+    timeline_tab.click()
+    time.sleep(10)
 
     # Tìm phần tử contenteditable
     p = driver.find_element(By.CSS_SELECTOR, "div[contenteditable='true']")
@@ -504,9 +508,9 @@ def edit_audio_summary():
     html = p.get_attribute("innerHTML")
 
     # Đoạn văn bản mục tiêu
-    targetText = "gây ra bởi các chính sách tàn bạo của chính quyền Liên Xô dưới sự lãnh đạo của Joseph Stalin."
+    targetText = "Rất có thể đây là kế hoạch có chủ ý được thực hiện một cách tinh vi, có chủ đích để kiểm soát và đàn áp cả một dân tộc"
     # Đoạn văn bản cần chèn
-    insertText = " Đây là một trong những chủ đề được cộng đồng học thuật và chính trị quốc tế quan tâm ngày càng nhiều trong những năm gần đây."
+    insertText = " ĐÂY LÀ ĐOẠN TEXT ĐƯỢC THÊM BỞI AUTO TEST. "
 
     # Kiểm tra nếu targetText có trong đoạn HTML của phần tử
     if targetText in html:
@@ -533,6 +537,107 @@ def edit_audio_summary():
         print("❌ Không tìm thấy đoạn văn bản mục tiêu!")
         
 
+def delete_audio_summary_text():
+    driver.get("https://app.memobot.io/")
+    time.sleep(10)
+    search_input = 'Holodomor'
+    search_audio(search_input)
+    audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
+    audio_titles[0].click()
+    time.sleep(5)
+
+    # Mở tab "Dòng thời gian"
+    timeline_tab = driver.find_element(By.XPATH, "//button[contains(text(),'Dòng thời gian')]")
+    timeline_tab.click()
+    time.sleep(10)
+
+    # Tìm phần tử contenteditable
+    p = driver.find_element(By.CSS_SELECTOR, "div[contenteditable='true']")
+    html = p.get_attribute("innerHTML")
+
+    # Đoạn văn bản mục tiêu cần xóa
+    targetText = "ĐÂY LÀ ĐOẠN TEXT ĐƯỢC THÊM BỞI AUTO TEST."
+
+    if targetText in html:
+        print("✅ Đoạn văn bản mục tiêu đã được tìm thấy!")
+
+        # Xóa đoạn targetText
+        new_html = html.replace(targetText, '')
+
+        # Cập nhật lại nội dung đã xóa
+        driver.execute_script("arguments[0].innerHTML = arguments[1];", p, new_html)
+
+        time.sleep(2)
+
+        # Kiểm tra kết quả sau khi xóa
+        html_after_delete = p.get_attribute("innerHTML")
+        if targetText not in html_after_delete:
+            print("✅ Đã xóa thành công đoạn văn bản!")
+        else:
+            print("❌ Xóa thất bại – đoạn văn bản vẫn còn tồn tại!")
+    else:
+        print("❌ Không tìm thấy đoạn văn bản mục tiêu để xóa!")
+
+
+def format_audio_summary_text(style='bold'):
+    driver.get("https://app.memobot.io/")
+    time.sleep(10)
+    search_input = 'Holodomor'
+    search_audio(search_input)
+    audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
+    audio_titles[0].click()
+    time.sleep(5)
+
+    # Mở tab "Dòng thời gian"
+    timeline_tab = driver.find_element(By.XPATH, "//button[contains(text(),'Dòng thời gian')]")
+    timeline_tab.click()
+    time.sleep(10)
+
+    # Lấy phần tử contenteditable
+    p = driver.find_element(By.CSS_SELECTOR, "div[contenteditable='true']")
+    html = p.get_attribute("innerHTML")
+
+    # Đoạn văn cần định dạng
+    targetText = "Rất có thể đây là kế hoạch có chủ ý được thực hiện một cách tinh vi, có chủ đích để kiểm soát và đàn áp cả một dân tộc"
+
+    if targetText in html:
+        print("✅ Đã tìm thấy đoạn văn bản cần định dạng!")
+
+        # Định dạng đoạn văn
+        if style == 'bold':
+            formatted = f"<b>{targetText}</b>"
+        elif style == 'italic':
+            formatted = f"<i>{targetText}</i>"
+        else:
+            print("⚠️ Chỉ hỗ trợ định dạng 'bold' hoặc 'italic'.")
+            return
+
+        # Thay thế trong HTML
+        driver.execute_script("window.scrollTo(0, 0);")
+        new_html = html.replace(targetText, formatted)
+        driver.execute_script("arguments[0].innerHTML = arguments[1];", p, new_html)
+
+        time.sleep(2)
+
+        # Kiểm tra xem đã thay thành công chưa
+        html_after_format = p.get_attribute("innerHTML")
+        # Tạo biểu thức regex dựa theo style
+        # re.escape(targetText) để escape ký tự đặc biệt.
+        # .*? cho phép có các thẻ HTML bọc quanh targetText (như <span>).
+        # flags=re.DOTALL để . match cả xuống dòng nếu có.
+        if style == 'bold':
+            pattern = rf"<strong[^>]*>.*?{re.escape(targetText)}.*?</strong>"
+        elif style == 'italic':
+            pattern = rf"<i[^>]*>.*?{re.escape(targetText)}.*?</i>"
+        else:
+            pattern = None
+
+        if pattern and re.search(pattern, html_after_format, flags=re.DOTALL):
+            print(f"✅ Đã áp dụng định dạng {style} thành công!")
+        else:
+            print(f"❌ Không áp dụng được định dạng {style}.")                      
+
+
 email_plus = "memo17@mailinator.com"
 password_plus = "Abcd@12345"
 url = "https://sohoa.memobot.io/analytic-v2/api/v1/payment/user-usage-stats"
@@ -555,7 +660,10 @@ check_language_audio_name = "Tác hại của màn hình điện tử đối v�
 chosen_language = 'Tiếng Việt'
 #check language of an uploaded audio
 # check_language(chosen_language, check_language_audio_path, check_language_audio_name)
-edit_audio_summary()
+# edit_audio_summary()
+# delete_audio_summary_text()
+format_audio_summary_text('bold')
+format_audio_summary_text('italic')
 
 
 
