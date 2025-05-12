@@ -11,11 +11,7 @@ import json
 import time
 import os
 
-driver = setupDriver.setupWebdriver()
-wait = WebDriverWait(driver, 10)
-options = Options()
-
-def check_login(email, password):
+def check_login(driver, wait, email, password):
     input_email = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="Email"]')
     input_password = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="Mật khẩu"]')
     login_btn = driver.find_element(By.ID, 'web-login')
@@ -72,7 +68,7 @@ def check_account_information():
 
 def get_token_from_local_storage():
         # Execute JavaScript to get the "tokens" value from local storage
-    tokens = driver.execute_script("return localStorage.getItem('tokens')")
+    tokens = driver.execute_script("return Coo.getItem('tokens')")
 
     # Print the tokens
     print("Tokens from local storage:", tokens)
@@ -82,31 +78,6 @@ def get_token_from_local_storage():
         tokens_data = json.loads(tokens)
         access_token = tokens_data.get("access", {}).get("token")
         print("Access Token:", access_token)
-
-# def get_token_from_api(url):
-#     # Example headers (customize as needed)
-#     headers = {
-#         "Content-Type": "application/json",
-#         "Accept": "application/json",
-#         # Add any other required headers here
-#     }
-
-#     # Send the request
-#     response = requests.get(url, headers=headers)
-
-#     # Check if the response is successful
-#     if response.status_code == 200:
-#         # Extract the Authorization token from headers
-#         token = response.headers.get("Authorization")
-#         if token:
-#             print("Token extracted from API headers:", token)
-#         else:
-#             print("Authorization token not found in headers.")
-#         return token
-#     else:
-#         print(f"Failed to fetch API. Status code: {response.status_code}")
-#         return None
-
 
 def get_response_data(url, token=None):
     headers = {} 
@@ -208,7 +179,7 @@ def check_list_languages():
         print(f"An error occurred: {e}")        
 
 
-def go_to_page(url):
+def go_to_page(driver, wait, url):
     current_url = driver.current_url
     # Check if the URL does not contain the specified text
     if url not in current_url:
@@ -217,8 +188,8 @@ def go_to_page(url):
     else:
         print("Already on the correct page, continuing execution.")
 
-def search_audio(search_input):
-    go_to_page("https://app.memobot.io/")
+def search_audio(driver, wait, search_input):
+    go_to_page(driver, wait, "https://app.memobot.io/")
     try:
         print("search input is: ", search_input)
         search_textbox = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@id='search_transcript']")))
@@ -637,35 +608,37 @@ def format_audio_summary_text(style='bold'):
         else:
             print(f"❌ Không áp dụng được định dạng {style}.")                      
 
+if __name__ == "__main__":
+    driver = setupDriver.setupWebdriver()
+    wait = WebDriverWait(driver, 10)
+    options = Options()
 
-email_plus = "memo17@mailinator.com"
-password_plus = "Abcd@12345"
-url = "https://sohoa.memobot.io/analytic-v2/api/v1/payment/user-usage-stats"
-audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
-audio_upload_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24" #get the exactly name of the audio after successfully
+    email_plus = "memo17@mailinator.com"
+    password_plus = "Abcd@12345"
+    check_login(driver, wait, email_plus, password_plus)
+    # check_account_information()
+    # get_token_from_local_storage()
+    # # check_user_package(url)
 
-check_login(email_plus, password_plus)
-# check_account_information()
-# get_token_from_local_storage()
-# check_user_package(url)
-# check_list_languages()
-# upload_file("Tiếng Việt", audio_path, audio_upload_name)
-# search_input = "nội dung tiêu cực" 
-# search_audio(search_input)
-# edit_audio_name(0,"Tên mới của audio")
-# delete_audio()
-# filter_audio_by_date()
-check_language_audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
-check_language_audio_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24"
-chosen_language = 'Tiếng Việt'
-#check language of an uploaded audio
-# check_language(chosen_language, check_language_audio_path, check_language_audio_name)
-# edit_audio_summary()
-# delete_audio_summary_text()
-format_audio_summary_text('bold')
-format_audio_summary_text('italic')
+    # url = "https://sohoa.memobot.io/analytic-v2/api/v1/payment/user-usage-stats"
+    # audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
+    # audio_upload_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24" #get the exactly name of the audio after successfully
+    # check_list_languages()
+    # upload_file("Tiếng Việt", audio_path, audio_upload_name)
+    search_input = "nội dung tiêu cực" 
+    search_audio(driver, wait, search_input)
+    # edit_audio_name(0,"Tên mới của audio")
+    # delete_audio()
+    # filter_audio_by_date()
 
-
+    # check_language_audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
+    # check_language_audio_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24"
+    # chosen_language = 'Tiếng Việt'
+    # check_language(chosen_language, check_language_audio_path, check_language_audio_name)
+    # edit_audio_summary()
+    # delete_audio_summary_text()
+    # format_audio_summary_text('bold')
+    # format_audio_summary_text('italic')
 
 
 
