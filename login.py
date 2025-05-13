@@ -460,16 +460,19 @@ def check_language(chosen_language, audio_path, audio_upload_name):
     detect_language_from_text(full_text, lang_code)
 
 
-def edit_audio_summary():
+def edit_audio_summary(driver, wait, search_input, text_tab, targetText, insertText):
     driver.get("https://app.memobot.io/")
     time.sleep(10)
-    search_input= 'Holodomor'
-    search_audio(search_input)
+    # search_input= 'Holodomor'
+    search_audio(driver, wait, search_input)
     audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
     audio_titles[0].click()
     time.sleep(5)
-    timeline_tab = driver.find_element(By.XPATH, "//button[contains(text(),'Dòng thời gian')]")
-    timeline_tab.click()
+    tab_option = f"//button[contains(text(),'{text_tab}')]"
+    text_tab = wait.until(
+        EC.presence_of_element_located((By.XPATH, tab_option))
+    )
+    text_tab.click()
     time.sleep(10)
 
     # Tìm phần tử contenteditable
@@ -477,11 +480,7 @@ def edit_audio_summary():
 
     # Lấy HTML hiện tại trong phần tử
     html = p.get_attribute("innerHTML")
-
-    # Đoạn văn bản mục tiêu
-    targetText = "Rất có thể đây là kế hoạch có chủ ý được thực hiện một cách tinh vi, có chủ đích để kiểm soát và đàn áp cả một dân tộc"
-    # Đoạn văn bản cần chèn
-    insertText = " ĐÂY LÀ ĐOẠN TEXT ĐƯỢC THÊM BỞI AUTO TEST. "
+    # print("htmllllllllllllllllllllllllll: " + html)
 
     # Kiểm tra nếu targetText có trong đoạn HTML của phần tử
     if targetText in html:
@@ -626,7 +625,7 @@ if __name__ == "__main__":
     # check_list_languages()
     # upload_file("Tiếng Việt", audio_path, audio_upload_name)
     search_input = "nội dung tiêu cực" 
-    search_audio(driver, wait, search_input)
+    # search_audio(driver, wait, search_input)
     # edit_audio_name(0,"Tên mới của audio")
     # delete_audio()
     # filter_audio_by_date()
@@ -635,10 +634,24 @@ if __name__ == "__main__":
     # check_language_audio_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24"
     # chosen_language = 'Tiếng Việt'
     # check_language(chosen_language, check_language_audio_path, check_language_audio_name)
+
+    # # Đoạn văn bản mục tiêu dể sửa audio
+    # targetText = "Rất có thể đây là kế hoạch có chủ ý được thực hiện một cách tinh vi, có chủ đích để kiểm soát và đàn áp cả một dân tộc"
+    # # Đoạn văn bản cần chèn
+    # insertText = " ĐÂY LÀ ĐOẠN TEXT ĐƯỢC THÊM BỞI AUTO TEST. "
+
+    # Đoạn văn bản mục tiêu dể sửa audio
+    targetText = "Rất có thể đây là kế hoạch có chủ ý được thực hiện một cách tinh vi, có chủ đích để kiểm soát và đàn áp cả một dân tộc"
+    # Đoạn văn bản cần chèn
+    insertText = " ĐÂY LÀ ĐOẠN TEXT ĐƯỢC THÊM BỞI AUTO TEST. "
+
+    
     # edit_audio_summary()
     # delete_audio_summary_text()
     # format_audio_summary_text('bold')
     # format_audio_summary_text('italic')
+
+    edit_audio_summary(driver, wait, 'holodomor', 'Bản dịch', targetText, insertText)
 
 
 
