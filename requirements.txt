@@ -1,0 +1,6 @@
+selenium
+pytest
+requests
+webdriver-manager
+pyperclip
+langdetect
