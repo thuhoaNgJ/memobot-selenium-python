@@ -459,15 +459,15 @@ def check_language(chosen_language, audio_path, audio_upload_name):
     print("📝 Full sentence:", full_text)
     detect_language_from_text(full_text, lang_code)
 
-
-def edit_audio_summary(driver, wait, search_input, text_tab, targetText, insertText):
+def go_to_audio_by_search(driver, wait, search_input):
     driver.get("https://app.memobot.io/")
     time.sleep(10)
-    # search_input= 'Holodomor'
     search_audio(driver, wait, search_input)
     audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
     audio_titles[0].click()
     time.sleep(5)
+
+def edit_audio_summary(driver, wait, text_tab, targetText, insertText):
     tab_option = f"//button[contains(text(),'{text_tab}')]"
     text_tab = wait.until(
         EC.presence_of_element_located((By.XPATH, tab_option))
@@ -641,17 +641,17 @@ if __name__ == "__main__":
     # insertText = " ĐÂY LÀ ĐOẠN TEXT ĐƯỢC THÊM BỞI AUTO TEST. "
 
     # Đoạn văn bản mục tiêu dể sửa audio
-    targetText = "Rất có thể đây là kế hoạch có chủ ý được thực hiện một cách tinh vi, có chủ đích để kiểm soát và đàn áp cả một dân tộc"
+    targetText = "Điện thoại thông minh và Internet đã trở thành một phần không thể thiếu trong cuộc sống của mọi người, từ trẻ nhỏ đến người già"
     # Đoạn văn bản cần chèn
     insertText = " ĐÂY LÀ ĐOẠN TEXT ĐƯỢC THÊM BỞI AUTO TEST. "
-
-    
-    # edit_audio_summary()
+    # Cần gọi hàm tới audio trước sau đó gọi hàm sửa audio
+    go_to_audio_by_search(driver, wait, "internet")
+    edit_audio_summary(driver, wait, 'Dòng thời gian', targetText, insertText)
     # delete_audio_summary_text()
     # format_audio_summary_text('bold')
     # format_audio_summary_text('italic')
 
-    edit_audio_summary(driver, wait, 'holodomor', 'Bản dịch', targetText, insertText)
+
 
 
 
