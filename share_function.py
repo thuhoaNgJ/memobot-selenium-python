@@ -75,11 +75,8 @@ def setup_shared_user(driver, wait, permission_option):
     print(f"Đã chọn quyền chia sẻ: {permission_option}")
     time.sleep(5)  # đợi hệ thống lưu quyền
     copy_button.click()
-    print("Đã sao chép liên kết chia sẻ.")
-    share_url = pyperclip.paste()
-    print("✅ URL đã copy là:", share_url)
-    print("done function get_share_audio_link")
-    return share_url
+    time.sleep(5)
+    
 
 #check quyền của user
 # Check user không được phân quyền
@@ -88,17 +85,43 @@ def check_user_no_auth(driver, wait, share_url):
     wait.until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, "img[src='/memobot-v2/logo-memo.png']")))
     page_text = driver.find_element(By.TAG_NAME, "body").text
     if "Bạn không có quyền truy cập trang này" in page_text:
-        print("🚫User không có quyền xem audio này.")
+        print("🚫User chưa được chia sẻ không có quyền xem audio này.")
     else:
-        print("✅Người dùng có quyền truy cập.")
-    return
+        print("✅User có quyền truy cập.")
 
 # check tất cả user có quyền xem
 def check_user_only_see(driver, wait, share_url):
     driver.get(share_url)
     wait.until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, "img[src='/memobot-v2/logo-memo.png']")))
-    text_tab, targetText, insertText = ["Dòng thời gian", "Điện thoại thông minh và Internet", "Thêm đoạn text"]
-    login.edit_audio_summary(driver, wait, text_tab, targetText, insertText)
+
+    element = driver.find_element(By.CSS_SELECTOR, "div[contenteditable]")  
+
+    # Lấy giá trị thuộc tính
+    contenteditable_value = element.get_attribute("contenteditable")
+
+    page_text = driver.find_element(By.TAG_NAME, "body").text
+    #check the audio's name in the page text
+    if ("internet" in page_text) and contenteditable_value == "false":
+        print("✅User có quyền truy cập và chỉ có thể xem audio này.")
+    else:
+        print("🚫User chưa được chia sẻ không có quyền xem audio này.")
+
+# check tất cả user có quyền xem và edit
+def check_user_edit(driver, wait, share_url):
+    driver.get(share_url)
+    wait.until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, "img[src='/memobot-v2/logo-memo.png']")))
+
+    element = driver.find_element(By.CSS_SELECTOR, "div[contenteditable]") 
+
+    # Lấy giá trị thuộc tính
+    contenteditable_value = element.get_attribute("contenteditable")
+
+    page_text = driver.find_element(By.TAG_NAME, "body").text
+    #check the audio's name in the page text
+    if ("internet" in page_text) and contenteditable_value == "true":
+        print("✅User có quyền truy cập và có thể chỉnh sửa audio này.")
+    else:
+        print("🚫User chưa được chia sẻ không có quyền xem audio này.")
 
 if __name__ == "__main__":
     email_host = 'memo17@mailinator.com'
@@ -110,21 +133,31 @@ if __name__ == "__main__":
     driverHost = setupDriver.setupWebdriver()
     waitHost = WebDriverWait(driverHost, 15)
 
+    # Đăng nhập tài khoản user1 và user2
     driverUser = setupDriver.setupWebdriver()
     waitUser = WebDriverWait(driverUser, 15)
-    # Tài khoản user1 và user2
 
     login.check_login(driverHost, waitHost, email_host, pass_host)
     login.check_login(driverUser, waitUser, email_user, pass_user)
 
-    share_url = get_share_audio_link(driverHost, waitHost)
-    check_user_no_auth(driverUser, waitUser, share_url)
-
     invite_only_option = "Chỉ những người đùng được mời"
     view_only_option = "Bất kì ai có link đều có thể xem"
     edit_option = "Bất kì ai có link đều có thể xem và chỉnh sửa"
+
+    # Chuyển đến trang audio và lấy link chia sẻ
+    share_url = get_share_audio_link(driverHost, waitHost)
+    # share = 'https://app.memobot.io/memobot-v2/#!/doc-colab/731e_1747131111581'
+
+    # Check mặc định -> user chưa được phân quyền
+    check_user_no_auth(driverUser, waitUser, share_url)
+
+    # Check user chỉ có quyền xem
     setup_shared_user(driverHost, waitHost, view_only_option)
-    # check_user_only_see(driverUser, waitUser, share_url)
+    check_user_only_see(driverUser, waitUser, share_url)
+
+    # Check user có quyền xem và chỉnh sửa
+    setup_shared_user(driverHost, waitHost, edit_option)
+    check_user_edit(driverUser, waitUser, share_url)
 
 
 

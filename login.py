@@ -625,7 +625,7 @@ if __name__ == "__main__":
     # audio_upload_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24" #get the exactly name of the audio after successfully
     # check_list_languages()
     # upload_file("Tiếng Việt", audio_path, audio_upload_name)
-    search_input = "nội dung tiêu cực" 
+    # search_input = "nội dung tiêu cực" 
     # search_audio(driver, wait, search_input)
     # edit_audio_name(0,"Tên mới của audio")
     # delete_audio()
@@ -635,11 +635,6 @@ if __name__ == "__main__":
     # check_language_audio_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24"
     # chosen_language = 'Tiếng Việt'
     # check_language(chosen_language, check_language_audio_path, check_language_audio_name)
-
-    # # Đoạn văn bản mục tiêu dể sửa audio
-    # targetText = "Rất có thể đây là kế hoạch có chủ ý được thực hiện một cách tinh vi, có chủ đích để kiểm soát và đàn áp cả một dân tộc"
-    # # Đoạn văn bản cần chèn
-    # insertText = " ĐÂY LÀ ĐOẠN TEXT ĐƯỢC THÊM BỞI AUTO TEST. "
 
     # Đoạn văn bản mục tiêu dể sửa audio
     targetText = "Điện thoại thông minh và Internet đã trở thành một phần không thể thiếu trong cuộc sống của mọi người, từ trẻ nhỏ đến người già"
