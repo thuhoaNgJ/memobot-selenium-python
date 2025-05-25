@@ -10,6 +10,7 @@ import requests
 import json
 import time
 import os
+from selenium.common.exceptions import TimeoutException
 
 def check_login(driver, wait, email, password):
     input_email = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="Email"]')
