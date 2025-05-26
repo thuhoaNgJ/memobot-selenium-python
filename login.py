@@ -620,11 +620,11 @@ if __name__ == "__main__":
     # get_token_from_local_storage()
     # # check_user_package(url)
 
-    # url = "https://sohoa.memobot.io/analytic-v2/api/v1/payment/user-usage-stats"
-    # audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
-    # audio_upload_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24" #get the exactly name of the audio after successfully
+    url = "https://sohoa.memobot.io/analytic-v2/api/v1/payment/user-usage-stats"
+    audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
+    audio_upload_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24" #get the exactly name of the audio after successfully
     # check_list_languages()
-    # upload_file("Tiếng Việt", audio_path, audio_upload_name)
+    upload_file("Tiếng Việt", audio_path, audio_upload_name)
     # search_input = "nội dung tiêu cực" 
     # search_audio(driver, wait, search_input)
     # edit_audio_name(0,"Tên mới của audio")
@@ -637,12 +637,12 @@ if __name__ == "__main__":
     # check_language(chosen_language, check_language_audio_path, check_language_audio_name)
 
     # Đoạn văn bản mục tiêu dể sửa audio
-    targetText = "Điện thoại thông minh và Internet đã trở thành một phần không thể thiếu trong cuộc sống của mọi người, từ trẻ nhỏ đến người già"
+    # targetText = "Điện thoại thông minh và Internet đã trở thành một phần không thể thiếu trong cuộc sống của mọi người, từ trẻ nhỏ đến người già"
     # Đoạn văn bản cần chèn
-    insertText = " ĐÂY LÀ ĐOẠN TEXT ĐƯỢC THÊM BỞI AUTO TEST. "
+    # insertText = " ĐÂY LÀ ĐOẠN TEXT ĐƯỢC THÊM BỞI AUTO TEST. "
     # Cần gọi hàm tới audio trước sau đó gọi hàm sửa audio
-    go_to_audio_by_search(driver, wait, "internet")
-    edit_audio_summary(driver, wait, 'Dòng thời gian', targetText, insertText)
+    # go_to_audio_by_search(driver, wait, "internet")
+    # edit_audio_summary(driver, wait, 'Dòng thời gian', targetText, insertText)
     # delete_audio_summary_text()
     # format_audio_summary_text('bold')
     # format_audio_summary_text('italic')

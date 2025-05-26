@@ -34,7 +34,7 @@ def search_audio(driver, wait, search_input):
         print(f"An error occurred: {e}")
 
 def get_share_audio_link(driver, wait):
-    go_to_audio(driver, wait, "internet")
+    search_audio(driver, wait, "internet")
     share_function_btn = wait.until(EC.presence_of_element_located((By.XPATH, "//button[@id='share_transcript'][1]")))
     share_function_btn.click()
     time.sleep(5)
