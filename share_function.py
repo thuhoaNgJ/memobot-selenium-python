@@ -9,10 +9,10 @@ import time
 import pyperclip
 
 #User host setup authorization for audio
-def go_to_audio(driver, wait, search_input):
+def search_audio(driver, wait, search_input):
     audio_text = "Tác hại của việc sử dụng quá nhiều internet và thiết bị thông minh, đặc biệt là với trẻ em và thanh thiếu niên"
     page_text = driver.find_element(By.TAG_NAME, "body").text
-    print("page text: "+ page_text)
+    # print("page text: "+ page_text)
     if audio_text not in page_text:
         driver.get("https://app.memobot.io/")
     try:
@@ -53,7 +53,7 @@ def setup_shared_user(driver, wait, permission_option):
     driver.get("https://app.memobot.io/")
     time.sleep(10)  # wait for the page to load
     print("Starting to set up shared user permissions...")
-    go_to_audio(driver, wait, "internet")
+    search_audio(driver, wait, "internet")
     share_function_btn = wait.until(EC.presence_of_element_located((By.XPATH, "//button[@id='share_transcript'][1]")))
     share_function_btn.click()
     time.sleep(5)
@@ -75,10 +75,37 @@ def setup_shared_user(driver, wait, permission_option):
     print(f"Đã chọn quyền chia sẻ: {permission_option}")
     time.sleep(5)  # đợi hệ thống lưu quyền
     copy_button.click()
-    time.sleep(5)
-    
 
-#check quyền của user
+def setup_shared_user_by_email(driver, wait, email, auth_user):
+    driver.get("https://app.memobot.io/")
+    permission_option = "Chỉ những người đùng được mời"
+    setup_shared_user(driver, wait, permission_option)
+    email_input = wait.until(
+        EC.presence_of_element_located((By.XPATH, "(//input[contains(@placeholder,'Nhập email để chia sẻ...')])[1]")))
+    email_input.send_keys(email)
+    time.sleep(5)  # wait for the email input to be filled
+
+    # Click the dropdown to select the authorization option
+    dropdown_auth_option = driver.find_element(By.XPATH, "//div[@class='mt-4']//div[@class='el-dropdown']")
+    dropdown_auth_option.click()
+    time.sleep(3)  # wait for the dropdown to open
+    # auth_option = wait.until(
+    #     EC.presence_of_element_located((By.XPATH, 
+    #         "//ul[@id='dropdown-menu-5084']//li[contains(@class,'el-dropdown-menu__item')][contains(text(),'Chỉ xem')]"
+    # )))
+    auth_option = wait.until(
+        EC.presence_of_element_located((By.XPATH, 
+            f"//li[contains(text(),'{auth_user}')]"
+        )))
+
+    auth_option.click()
+    time.sleep(2)  # wait for the option to be selected
+    save_button = wait.until(
+        EC.presence_of_element_located((By.XPATH, "//span[contains(text(),'Chia sẻ và sao chép liên kết')]")))
+    save_button.click()
+    print(f"✅ Đã chia sẻ audio với email: {email} và quyền truy cập là: {auth_user}")
+        
+#  CHECK USER AUTHORIZATION
 # Check user không được phân quyền
 def check_user_no_auth(driver, wait, share_url):
     driver.get(share_url)
@@ -158,6 +185,22 @@ if __name__ == "__main__":
     # Check user có quyền xem và chỉnh sửa
     setup_shared_user(driverHost, waitHost, edit_option)
     check_user_edit(driverUser, waitUser, share_url)
+
+    # Check quyền truy cập cho user cụ thể bằng email
+
+    email_view_only_option = "Chỉ xem"
+    email_edit_option = "Chỉnh sửa"
+    email_cancel_option = "Hủy truy cập"
+    share = 'https://app.memobot.io/memobot-v2/#!/doc-colab/731e_1747131111581'
+    # check quyền chỉ xem cho user email
+    setup_shared_user_by_email(driverHost, waitHost, email_user, email_view_only_option)
+    check_user_only_see(driverUser, waitUser, share)
+    # check quyền chỉnh sửa cho user email
+    setup_shared_user_by_email(driverHost, waitHost, email_user, email_view_only_option)
+    check_user_edit(driverUser, waitUser, share)
+    # check quyền hủy truy cập cho user email 
+    setup_shared_user_by_email(driverHost, waitHost, email_user, email_cancel_option)
+    check_user_no_auth(driverUser, waitUser, share)
 
 
 
