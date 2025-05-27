@@ -148,7 +148,7 @@ def check_user_package(url):
 
 # Check list languages
 def check_list_languages():
-    go_to_page("https://app.memobot.io")
+    go_to_page(driver, "https://app.memobot.io")
 
     upload_button = wait.until(EC.presence_of_element_located((By.XPATH, "//button[@id='upload-audio']")))
     driver.execute_script("arguments[0].click();", upload_button)
@@ -180,7 +180,7 @@ def check_list_languages():
         print(f"An error occurred: {e}")        
 
 
-def go_to_page(driver, wait, url):
+def go_to_page(driver, url):
     current_url = driver.current_url
     # Check if the URL does not contain the specified text
     if url not in current_url:
@@ -190,7 +190,7 @@ def go_to_page(driver, wait, url):
         print("Already on the correct page, continuing execution.")
 
 def search_audio(driver, wait, search_input):
-    go_to_page(driver, wait, "https://app.memobot.io/")
+    go_to_page(driver, "https://app.memobot.io/")
     try:
         print("search input is: ", search_input)
         search_textbox = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@id='search_transcript']")))
@@ -210,14 +210,14 @@ def search_audio(driver, wait, search_input):
         print(f"An error occurred: {e}")
 
 def filter_audio_by_date():
-    go_to_page("https://app.memobot.io/")
+    go_to_page(driver, "https://app.memobot.io/")
     try:
         date_filter_box = wait.until(EC.presence_of_element_located((By.XPATH, "//input[contains(@placeholder,'Đến ngày')]")))
     except Exception as e:
         print(f"An error occurred: {e}")
 
 def edit_audio_name(title_id, new_title):
-    go_to_page("https://app.memobot.io/")
+    go_to_page(driver, "https://app.memobot.io/")
 
     audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
     
@@ -245,7 +245,7 @@ def edit_audio_name(title_id, new_title):
         print("❌ Audio title is changed unsuccessfully")
 
 def delete_audio():
-    go_to_page("https://app.memobot.io/")
+    go_to_page(driver, "https://app.memobot.io/")
     audio_titles = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']")))
 
     if len(audio_titles) > 0: 
@@ -272,7 +272,7 @@ def delete_audio():
             print("✅The number of audio is 0. The audio is already deleted.")
 
 def filter_audio_by_date():
-    go_to_page("https://app.memobot.io/")
+    go_to_page(driver, "https://app.memobot.io/")
     calender_filter = wait.until(EC.presence_of_all_elements_located(
         (By.XPATH, "//input[contains(@placeholder, 'Tìm từ ngày')]")))
     calender_filter.click()
@@ -280,8 +280,8 @@ def filter_audio_by_date():
     return
  
 
-def upload_file(chosen_language, audio_path, audio_upload_name):
-    go_to_page("https://app.memobot.io/")
+def upload_file(driver, wait, chosen_language, audio_path, audio_upload_name):
+    go_to_page(driver, "https://app.memobot.io/")
     time.sleep(5)
     
     try:
@@ -428,9 +428,9 @@ def detect_language_from_text(full_text: str, chosen_language_code):
 
 
 
-def check_language(chosen_language, audio_path, audio_upload_name):
-    go_to_page("https://app.memobot.io/")
-    upload_file(chosen_language, audio_path, audio_upload_name)
+def check_language(driver, wait, chosen_language, audio_path, audio_upload_name):
+    go_to_page(driver, "https://app.memobot.io/")
+    upload_file(driver, wait, chosen_language, audio_path, audio_upload_name)
     lang_code = get_lang_code(chosen_language)
     print("DONE upload " + chosen_language + " audio")
     # wait until the audio complete
@@ -621,10 +621,10 @@ if __name__ == "__main__":
     # # check_user_package(url)
 
     url = "https://sohoa.memobot.io/analytic-v2/api/v1/payment/user-usage-stats"
-    audio_path = "C://Users/admin/Videos/Memobot/Audio test memobot/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
+    audio_path = "/Users/apple/Documents/memobot/Vais memobot/audio file/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
     audio_upload_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24" #get the exactly name of the audio after successfully
     # check_list_languages()
-    upload_file("Tiếng Việt", audio_path, audio_upload_name)
+    upload_file(driver, wait,"Tiếng Việt", audio_path, audio_upload_name)
     # search_input = "nội dung tiêu cực" 
     # search_audio(driver, wait, search_input)
     # edit_audio_name(0,"Tên mới của audio")
