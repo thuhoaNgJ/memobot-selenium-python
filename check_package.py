@@ -5,14 +5,13 @@ import setupDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
 import time
 
 def go_to_package_page(driver):
     driver.get("https://app.memobot.io/thanh-toan")
     time.sleep(5)  # wait for the package page to load
 
-def package_upload_file(driver, wait):
+def check_package(driver, wait):
     go_to_package_page(driver)
     # check package before upload file
     print("-------Kiểm tra gói package của user hiện tại-------")
@@ -60,9 +59,8 @@ if __name__ == "__main__":
     email= 'memo17@mailinator.com'
     password = 'Abcd@12345'
 
-    # Khởi tạo 2 trình duyệt
     driver = setupDriver.setupWebdriver()
     wait = WebDriverWait(driver, 15)
 
     login.check_login(driver, wait, email, password)
-    package_upload_file(driver, wait)
+    check_package(driver, wait)
