@@ -216,7 +216,6 @@ if __name__ == "__main__":
     email= 'memo17@mailinator.com'
     password = 'Abcd@12345'
 
-    # Khởi tạo 2 trình duyệt
     driver = setupDriver.setupWebdriver()
     wait = WebDriverWait(driver, 15)
 
