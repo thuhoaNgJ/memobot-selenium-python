@@ -188,7 +188,7 @@ def save_answer(driver, wait):
             EC.presence_of_element_located((By.XPATH, "//*[contains(@class, 'justify-around')]"))
         )
         # ✅ Cuộn tới cuối
-        driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", discussion_div)
+        driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", element)
 
         save_button = WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.XPATH, "/i[@class='fa fa-save']"))
