@@ -9,10 +9,6 @@ import time
 import re
 from selenium.common.exceptions import TimeoutException
 
-def go_to_package_page(driver):
-    driver.get("https://app.memobot.io/thanh-toan")
-    time.sleep(5)  # wait for the package page to load
-
 def go_to_chatAI_page(driver, wait):
     search_input = "YouTube"
     check_login.search_audio(driver, wait, search_input)
@@ -57,7 +53,7 @@ def get_chatAT_token(driver, wait):
 # div class chứa 'justify-end': câu hỏi đã đươc gửi
 # div class chứa 'justify-start': câu trả lời do AI tạo ra
 
-def check_AIgen_question(driver, wait):
+def send_question(driver, wait):
     current_token, _ = get_chatAT_token(driver, wait)
     print("Giá trị token hiện tại là:", current_token)  
     
@@ -186,6 +182,36 @@ def check_copy_answer(driver, wait):
         else:
             print("❌ Không sao chép được câu trả lời.")
 
+def save_answer(driver, wait):
+    try:
+        element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//*[contains(@class, 'justify-around')]"))
+        )
+        # ✅ Cuộn tới cuối
+        driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", discussion_div)
+
+        save_button = WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located((By.XPATH, "/i[@class='fa fa-save']"))
+        )
+        print("Nút 'Lưu' đã xuất hiện.")
+    except TimeoutException:    
+        print("❌ Nút 'Lưu' chưa xuất hiện do chưa có câu hỏi và câu trả lời nào.")
+        check_input_question(driver, wait)
+
+    save_button.click()
+    print("✅ Đã bấm nút 'Lưu'.")
+    # Kiểm tra xem có thông báo lưu thành công không?
+    
+    # ✅ Tìm thẻ <p> đầu tiên bên trong div có id chứa 'noteModalbookmark'
+    p_element = driver.find_element(By.XPATH, "//div[contains(@id, 'noteModalbookmark')]//p[1]")
+
+    # ✅ Lấy text
+    first_paragraph = p_element.text
+    print("📝 Đoạn text đầu tiên trong <p>:", first_paragraph)    
+    clean_text = first_paragraph.split('[')[0].strip()
+    print("🔍 Text trước dấu [: ", clean_text)
+              
+
 if __name__ == "__main__":
     email= 'memo17@mailinator.com'
     password = 'Abcd@12345'
@@ -198,6 +224,7 @@ if __name__ == "__main__":
     # go_to_chatAI_page(driver, wait)
     driver.get("https://app.memobot.io/memobot-v2/#!/memobot-audios/chat/681d68bca4e66dc8d4736dbf")
     time.sleep(10)  # wait for the chat page to load
-    check_AIgen_question(driver, wait)
+    send_question(driver, wait)
     check_input_question(driver, wait)
     check_copy_answer(driver, wait)
+    # save_answer(driver, wait)
