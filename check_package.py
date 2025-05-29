@@ -1,5 +1,5 @@
 import math
-import login
+import check_login
 import setupDriver
 
 from selenium.webdriver.common.by import By
@@ -26,7 +26,7 @@ def check_package(driver, wait):
     driver.get("https://app.memobot.io")
     audio_path = "/Users/apple/Documents/memobot/Vais memobot/audio file/Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24.mp3"
     audio_upload_name = "Tác hại của màn hình điện tử đối với trẻ nhỏ ｜ VTV24" #get the exactly name of the audio after successfully
-    login.upload_file(driver, wait, "Tiếng Việt", audio_path, audio_upload_name)
+    check_login.upload_file(driver, wait, "Tiếng Việt", audio_path, audio_upload_name)
     time.sleep(20)  # wait for the upload to complete
     print("Đã upload file thành công")
     lenth_audio = wait.until(EC.presence_of_element_located((By.XPATH, 
@@ -62,5 +62,5 @@ if __name__ == "__main__":
     driver = setupDriver.setupWebdriver()
     wait = WebDriverWait(driver, 15)
 
-    login.check_login(driver, wait, email, password)
+    check_login.check_login(driver, wait, email, password)
     check_package(driver, wait)

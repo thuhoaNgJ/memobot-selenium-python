@@ -1,5 +1,5 @@
 import pyperclip
-import login
+import check_login
 import setupDriver
 
 from selenium.webdriver.common.by import By
@@ -15,7 +15,7 @@ def go_to_package_page(driver):
 
 def go_to_chatAI_page(driver, wait):
     search_input = "YouTube"
-    login.search_audio(driver, wait, search_input)
+    check_login.search_audio(driver, wait, search_input)
     searched_audio_title = WebDriverWait(driver, 10).until(
         EC.presence_of_all_elements_located((By.XPATH, "//div[@class='audio_title']"))
         )
@@ -194,10 +194,10 @@ if __name__ == "__main__":
     driver = setupDriver.setupWebdriver()
     wait = WebDriverWait(driver, 15)
 
-    login.check_login(driver, wait, email, password)
+    check_login.check_login(driver, wait, email, password)
     # go_to_chatAI_page(driver, wait)
     driver.get("https://app.memobot.io/memobot-v2/#!/memobot-audios/chat/681d68bca4e66dc8d4736dbf")
     time.sleep(10)  # wait for the chat page to load
-    # check_AIgen_question(driver, wait)
-    # check_input_question(driver, wait)
+    check_AIgen_question(driver, wait)
+    check_input_question(driver, wait)
     check_copy_answer(driver, wait)

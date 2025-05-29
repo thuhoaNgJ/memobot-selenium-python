@@ -1,10 +1,9 @@
-import login
+import check_login
 import setupDriver
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
 import time
 import pyperclip
 
@@ -164,8 +163,8 @@ if __name__ == "__main__":
     driverUser = setupDriver.setupWebdriver()
     waitUser = WebDriverWait(driverUser, 15)
 
-    login.check_login(driverHost, waitHost, email_host, pass_host)
-    login.check_login(driverUser, waitUser, email_user, pass_user)
+    check_login.check_login(driverHost, waitHost, email_host, pass_host)
+    check_login.check_login(driverUser, waitUser, email_user, pass_user)
 
     invite_only_option = "Chỉ những người đùng được mời"
     view_only_option = "Bất kì ai có link đều có thể xem"
