@@ -187,7 +187,7 @@ if __name__ == "__main__":
     check_login.check_login(driver, wait, email, password)
 
     # đổi tên audio đầu tiên trong danh sách
-    edit_audio_name(0,"Tên mới của audio")
+    # edit_audio_name(0,"Tên mới của audio")
 
     # Đoạn văn bản mục tiêu dể sửa audio
     targetText = "Điện thoại thông minh và Internet đã trở thành một phần không thể thiếu trong cuộc sống của mọi người, từ trẻ nhỏ đến người già"
@@ -195,12 +195,12 @@ if __name__ == "__main__":
     insertText = " ĐÂY LÀ ĐOẠN TEXT ĐƯỢC THÊM BỞI AUTO TEST. "
 
     # Cần gọi hàm tới audio trước sau đó gọi hàm sửa audio
-    check_search_audio.search_audio.go_to_audio_by_search(driver, wait, "internet")
+    check_search_audio.go_to_audio_by_search(driver, wait, "internet")
 
     # thêm đoạn văn bản vào audio ở tab Dòng thời gian
     edit_audio_summary(driver, wait, 'Dòng thời gian', targetText, insertText)
     # Xóa đoạn văn bản đã chèn
-    delete_audio_summary_text()
+    # delete_audio_summary_text()
     # Định dạng đoạn văn bản
-    format_audio_summary_text('bold') #in đậm
-    format_audio_summary_text('italic') #in nghiêng
+    # format_audio_summary_text('bold') #in đậm
+    # format_audio_summary_text('italic') #in nghiêng
