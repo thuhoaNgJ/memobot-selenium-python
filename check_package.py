@@ -1,4 +1,5 @@
 import math
+import check_chatAI
 import check_login
 import setupDriver
 
@@ -55,6 +56,27 @@ def check_package(driver, wait):
     else:
         print("❌ Số phút sử dụng không tăng lên sau khi upload file")
 
+def check_number_used_AI_question(driver, wait):
+    go_to_package_page(driver)
+    # check package before asking AI question
+    before_package_AIchat = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class='content_info']//span[1])[5]")))
+    print("Số file đã upload của user hiện tại là: ", before_package_AIchat.text)
+    
+    driver.get("https://app.memobot.io/memobot-v2/#!/memobot-audios/chat/681d68bca4e66dc8d4736dbf")
+    time.sleep(10)  # wait for the chat page to load
+    check_chatAI.check_input_question(driver, wait)
+    go_to_package_page(driver)      
+
+    # check package after asking AI question
+    after_package_AIchat = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class='content_info']//span[1])[5]")))
+    print("Số file đã upload của user sau khi hỏi 1 câu chatAI là: ", after_package_AIchat.text)
+
+    # kiểm tra số câu hỏi AI đã tăng lên 1 sau khi hỏi 1 câu chatAI
+    if int(after_package_AIchat.text) == int(before_package_AIchat.text) + 1:
+        print("✅ Số câu hỏi AI đã tăng lên 1 sau khi hỏi 1 câu chatAI")
+    else:
+        print("❌ Số câu hỏi AI không tăng lên 1 sau khi hỏi 1 câu chatAI")
+
 if __name__ == "__main__":
     email= 'memo17@mailinator.com'
     password = 'Abcd@12345'
@@ -64,3 +86,4 @@ if __name__ == "__main__":
 
     check_login.check_login(driver, wait, email, password)
     check_package(driver, wait)
+    check_number_used_AI_question(driver, wait)
